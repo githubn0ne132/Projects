@@ -1,6 +1,10 @@
 # ProjectFlow: Collaborative Project & Task Management
 
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-1.1.0-orange)
+
 **ProjectFlow** is a robust, multi-user web application designed to streamline project management and task delegation. It features role-based access control, real-time progress tracking, file attachments, and an automated notification system to keep teams aligned.
+
+
 
 [Image of project management dashboard UI wireframe]
 
@@ -39,9 +43,10 @@ Secure authentication and authorization system with distinct roles:
     * A task they are following is updated (description change, status change, comment added).
     * A deadline is approaching.
 
-### 5. File Attachment System
+### 5. File Attachment System (Local)
 * **Uploads:** Drag-and-drop support for documents and images.
 * **Context:** Attach files directly to a **Project** (spec sheets, contracts) or a **Task** (mockups, reports).
+* **Storage:** Files are securely stored on the local file system (or mounted volume) for easy retrieval.
 
 ---
 
@@ -56,6 +61,7 @@ The architecture is built on the **PERN** stack (PostgreSQL, Express, React, Nod
 * **Backend:**
     * **Node.js & Express:** RESTful API architecture.
     * **Socket.io:** Real-time event handling for notifications and updates.
+    * **Multer:** Middleware for handling `multipart/form-data` (file uploads).
 * **Database:**
     * **PostgreSQL:** Relational database for structured data integrity.
     * **Sequelize ORM:** For schema management and database interactions.
@@ -64,7 +70,7 @@ The architecture is built on the **PERN** stack (PostgreSQL, Express, React, Nod
 [Image of entity relationship diagram for project management app]
 
 * **File Storage:**
-    * **AWS S3:** Scalable cloud storage for user uploads.
+    * **Local File System:** Uploads are stored in a static directory on the server (configured via `.env`).
 * **Search:**
     * **PostgreSQL Full-Text Search:** Native, high-performance indexing for the Global Search feature.
 
@@ -99,21 +105,27 @@ Follow these instructions to get a copy of the project up and running on your lo
     npm install
     ```
 
-3.  **Environment Configuration**
+3.  **Create Upload Directory**
+    Create the directory where uploaded files will be stored locally.
+    ```bash
+    mkdir server/uploads
+    ```
+
+4.  **Environment Configuration**
     Create a `.env` file in the root (or server) directory based on the example:
     ```bash
     cp .env.example .env
     ```
-    *Update the `.env` file with your specific credentials (DB URL, JWT Secret, AWS Keys).*
+    *Update the `.env` file with your DB credentials and upload path.*
 
-4.  **Database Migration**
+5.  **Database Migration**
     Run the migration script to set up the schema.
     ```bash
     # Using Sequelize CLI
     npx sequelize-cli db:migrate
     ```
 
-5.  **Run the Application**
+6.  **Run the Application**
     ```bash
     # Run Backend
     npm run start:server
@@ -137,9 +149,8 @@ Ensure the following variables are set for the app to function correctly:
 | `JWT_SECRET` | Secret key for signing auth tokens |
 | `SMTP_HOST` | Host for sending email notifications |
 | `SMTP_USER` | Email service username |
-| `AWS_ACCESS_KEY`| AWS Access Key ID for S3 |
-| `AWS_SECRET_KEY`| AWS Secret Access Key for S3 |
-| `AWS_BUCKET` | Bucket name for file uploads |
+| `UPLOAD_PATH` | Directory path for storing files (e.g., `./uploads`) |
+| `MAX_FILE_SIZE`| Limit for file uploads in bytes (e.g., `5242880` for 5MB) |
 
 ---
 
@@ -150,7 +161,7 @@ Ensure the following variables are set for the app to function correctly:
 2.  Fill in the project **Title** and **Description**, then save.
 3.  Click into the project and select **"Add Task"**.
 4.  Enter the task **Description** (instructions), deadline, and select a user from the **"Assignee"** dropdown.
-5.  Attach any relevant files.
+5.  Attach any relevant files (stored locally).
 6.  The assignee will receive a notification immediately.
 
 ### For Contributors
